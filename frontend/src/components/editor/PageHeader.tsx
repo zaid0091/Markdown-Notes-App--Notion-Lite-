@@ -3,6 +3,7 @@ import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import type { Page } from '../../types';
 import { useUpdatePage, useToggleFavorite, useUploadCover } from '../../hooks/usePages';
+import TagSelector from '../tags/TagSelector';
 
 interface PageHeaderProps {
   page: Page;
@@ -431,6 +432,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ page }) => {
             }}
           />
         </div>
+
+        {/* Custom Tag UI Manager */}
+        <TagSelector page={page} />
       </div>
     </div>
   );

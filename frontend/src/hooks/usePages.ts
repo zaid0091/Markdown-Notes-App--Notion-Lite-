@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '../api/client';
-import type { Page, PageTreeNode, SearchResult } from '../types';
+import type { Page, PageTreeNode, SearchResult, Tag } from '../types';
 
 // Hook: Fetch active hierarchical page tree
 export const usePageTree = () => {
@@ -165,6 +165,61 @@ export const useUploadCover = () => {
       queryClient.invalidateQueries({ queryKey: ['pageTree'] });
       queryClient.invalidateQueries({ queryKey: ['pagesList'] });
       queryClient.invalidateQueries({ queryKey: ['pageDetails', variables.id] });
+    },
+  });
+};
+
+// Hook: Fetch all tags for the authenticated user
+export const useTagsList = () => {
+  return useQuery<Tag[]>({
+    queryKey: ['tagsList'],
+    queryFn: async () => {
+      const response = await client.get<Tag[]>('/api/tags/');
+      return response.data;
+    },
+  });
+};
+
+// Hook: Create a new tag
+export const useCreateTag = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: Partial<Tag>) => {
+      const response = await client.post<Tag>('/api/tags/', data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tagsList'] });
+    },
+  });
+};
+
+// Hook: Update an existing tag
+export const useUpdateTag = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Tag> }) => {
+      const response = await client.patch<Tag>(`/api/tags/${id}/`, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tagsList'] });
+      queryClient.invalidateQueries({ queryKey: ['pageDetails'] });
+    },
+  });
+};
+
+// Hook: Delete a tag
+export const useDeleteTag = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await client.delete(`/api/tags/${id}/`);
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tagsList'] });
+      queryClient.invalidateQueries({ queryKey: ['pageDetails'] });
     },
   });
 };

@@ -9,6 +9,10 @@ vi.mock('../hooks/usePages', () => ({
   useUpdatePage: vi.fn(),
   useToggleFavorite: vi.fn(),
   useUploadCover: vi.fn(),
+  useTagsList: vi.fn(),
+  useCreateTag: vi.fn(),
+  useUpdateTag: vi.fn(),
+  useDeleteTag: vi.fn(),
 }));
 
 // Mock emoji picker to keep jsdom clean and execution fast
@@ -56,6 +60,26 @@ describe('PageHeader Component', () => {
     vi.mocked(hooks.useUploadCover).mockReturnValue({
       mutateAsync: mockMutateAsyncUpload,
     } as unknown as ReturnType<typeof hooks.useUploadCover>);
+
+    vi.mocked(hooks.useTagsList).mockReturnValue({
+      data: [],
+      isLoading: false,
+    } as unknown as ReturnType<typeof hooks.useTagsList>);
+
+    vi.mocked(hooks.useCreateTag).mockReturnValue({
+      mutate: vi.fn(),
+      mutateAsync: vi.fn(),
+    } as unknown as ReturnType<typeof hooks.useCreateTag>);
+
+    vi.mocked(hooks.useUpdateTag).mockReturnValue({
+      mutate: vi.fn(),
+      mutateAsync: vi.fn(),
+    } as unknown as ReturnType<typeof hooks.useUpdateTag>);
+
+    vi.mocked(hooks.useDeleteTag).mockReturnValue({
+      mutate: vi.fn(),
+      mutateAsync: vi.fn(),
+    } as unknown as ReturnType<typeof hooks.useDeleteTag>);
   });
 
   test('renders page title, cover image, and emoji correctly', () => {
