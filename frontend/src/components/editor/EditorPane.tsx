@@ -5,9 +5,10 @@ import { SlashMenu, COMMANDS, type SlashCommandItem } from './SlashMenu';
 
 interface EditorPaneProps {
   page: Page;
+  onChange?: (val: string) => void;
 }
 
-export const EditorPane: React.FC<EditorPaneProps> = ({ page }) => {
+export const EditorPane: React.FC<EditorPaneProps> = ({ page, onChange }) => {
   const updatePageMutation = useUpdatePage();
   
   const [content, setContent] = useState(page.content);
@@ -102,6 +103,9 @@ export const EditorPane: React.FC<EditorPaneProps> = ({ page }) => {
     setContent(val);
     setSaveStatus('saving');
     checkSlashTrigger(val, e.target.selectionStart);
+    if (onChange) {
+      onChange(val);
+    }
   };
 
   const handleSelectCommand = (item: SlashCommandItem) => {
@@ -115,6 +119,9 @@ export const EditorPane: React.FC<EditorPaneProps> = ({ page }) => {
     const newContent = beforeText + item.template + afterText;
     setContent(newContent);
     setSaveStatus('saving');
+    if (onChange) {
+      onChange(newContent);
+    }
 
     // Close menu
     setSlashMenu((prev) => ({ ...prev, isOpen: false }));

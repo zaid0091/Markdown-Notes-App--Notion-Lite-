@@ -1,15 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { usePageDetails } from '../hooks/usePages';
 import WorkspaceLayout from '../components/layout/WorkspaceLayout';
+import { PageHeader } from '../components/editor/PageHeader';
+import { EditorPane } from '../components/editor/EditorPane';
+import { PreviewPane } from '../components/editor/PreviewPane';
 
-const NotePage: React.FC = () => {
+export const NotePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  
+
   // Retrieve page details if an ID is present in the route params
   const { data: page, isLoading } = usePageDetails(id);
+
+  const [draftContent, setDraftContent] = useState('');
+  const [prevPageId, setPrevPageId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'edit' | 'split' | 'preview'>('split');
+
+  // Sync draftContent state with prop page.content synchronously on load or page navigation
+  if (page && page.id !== prevPageId) {
+    setDraftContent(page.content);
+    setPrevPageId(page.id);
+  }
 
   if (isLoading && id) {
     return (
@@ -29,42 +42,109 @@ const NotePage: React.FC = () => {
     );
   }
 
+  const hasCover = page ? !!page.cover_image : false;
+
   return (
     <WorkspaceLayout>
-      {/* Main Canvas Editor Area */}
-      <main style={{
-        padding: '40px 60px',
-        overflowY: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '24px',
-        height: '100%',
-        backgroundColor: 'var(--bg-primary)',
-        color: 'var(--text-primary)',
-        transition: 'background-color 0.3s ease, color 0.3s ease',
-      }}>
-        {id ? (
-          <div style={{ maxWidth: '800px', width: '100%', margin: '0 auto' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px' }}>
-              {page?.title || 'Untitled'}
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '24px' }}>
-              Last updated: {page ? new Date(page.updated_at).toLocaleString() : ''}
-            </div>
+      {id && page ? (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          overflow: 'hidden',
+          backgroundColor: 'var(--bg-primary)',
+        }}>
+          {/* Note Canvas Scrollable Header Wrapper */}
+          <div style={{ overflowY: 'auto', flexShrink: 0 }}>
+            <PageHeader page={page} />
+
+            {/* Positioned Action Options Toolbar (aligned with PageHeader coordinates) */}
             <div style={{
-              lineHeight: 1.7,
-              color: 'var(--text-primary)',
-              backgroundColor: 'var(--bg-secondary)',
-              padding: '24px',
-              borderRadius: '8px',
-              border: '1px solid var(--border-color)',
-              whiteSpace: 'pre-wrap',
-              transition: 'background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease',
+              maxWidth: '800px',
+              width: '100%',
+              margin: '0 auto',
+              padding: '0 54px',
+              position: 'relative',
             }}>
-              {page?.content || 'No content yet.'}
+              {/* View Mode Toggle Buttons Capsule */}
+              <div style={{
+                position: 'absolute',
+                top: hasCover ? '-15px' : '10px',
+                right: '110px',
+                display: 'flex',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '20px',
+                padding: '2px',
+                zIndex: 10,
+              }}>
+                {(['edit', 'split', 'preview'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    onClick={() => setViewMode(mode)}
+                    style={{
+                      background: viewMode === mode ? 'var(--bg-primary)' : 'transparent',
+                      color: viewMode === mode ? 'var(--accent-color)' : 'var(--text-muted)',
+                      border: 'none',
+                      padding: '4px 12px',
+                      borderRadius: '16px',
+                      fontSize: '0.7rem',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      cursor: 'pointer',
+                      transition: 'background 0.25s, color 0.25s',
+                      boxShadow: viewMode === mode ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                    }}
+                  >
+                    {mode}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        ) : (
+
+          {/* Split Pane Canvas Editor & Preview Area */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: viewMode === 'split' ? '1fr 1fr' : '1fr',
+            flexGrow: 1,
+            height: '0', // enables internal scrolling on children
+            overflow: 'hidden',
+            borderTop: '1px solid var(--border-color)',
+            marginTop: '20px',
+          }}>
+            {(viewMode === 'edit' || viewMode === 'split') && (
+              <div style={{
+                height: '100%',
+                overflow: 'hidden',
+                borderRight: viewMode === 'split' ? '1px solid var(--border-color)' : 'none',
+              }}>
+                <EditorPane page={page} onChange={setDraftContent} />
+              </div>
+            )}
+            {(viewMode === 'preview' || viewMode === 'split') && (
+              <div style={{
+                height: '100%',
+                overflow: 'hidden',
+              }}>
+                <PreviewPane content={draftContent} />
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* Empty Note State Dashboard */
+        <main style={{
+          padding: '40px 60px',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          backgroundColor: 'var(--bg-primary)',
+          color: 'var(--text-primary)',
+          transition: 'background-color 0.3s ease, color 0.3s ease',
+        }}>
           <div style={{
             display: 'flex',
             flexDirection: 'column',
@@ -79,8 +159,8 @@ const NotePage: React.FC = () => {
               Select a note from the sidebar or create a new one to get started.
             </p>
           </div>
-        )}
-      </main>
+        </main>
+      )}
     </WorkspaceLayout>
   );
 };
