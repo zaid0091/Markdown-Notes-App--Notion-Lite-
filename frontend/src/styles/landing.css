@@ -193,7 +193,7 @@
 .btn-secondary {
   background: var(--bg-secondary);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--text-muted);
 }
 .btn-secondary:hover {
   background: var(--border-glass);
@@ -203,11 +203,11 @@
 .btn-outline {
   background: transparent;
   color: var(--text-secondary);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--text-muted);
 }
 .btn-outline:hover {
   color: var(--text-primary);
-  border-color: var(--text-secondary);
+  border-color: var(--text-primary);
 }
 
 /* Interactive Mockup Dashboard */
