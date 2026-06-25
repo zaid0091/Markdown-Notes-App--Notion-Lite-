@@ -104,6 +104,7 @@ export const SearchPalette: React.FC = () => {
       }}
       onClick={() => setIsOpen(false)}
       data-testid="search-palette-overlay"
+      className="animate-fade-in"
     >
       {/* Modal Card Box */}
       <div
@@ -121,6 +122,7 @@ export const SearchPalette: React.FC = () => {
         }}
         onClick={(e) => e.stopPropagation()}
         data-testid="search-palette-modal"
+        className="animate-slide-up"
       >
         {/* Input area */}
         <div

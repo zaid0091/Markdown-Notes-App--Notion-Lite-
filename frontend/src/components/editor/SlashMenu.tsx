@@ -81,6 +81,7 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
   return (
     <div
       ref={menuRef}
+      className="animate-slide-up"
       style={{
         position: 'absolute',
         top: `${position.top}px`,

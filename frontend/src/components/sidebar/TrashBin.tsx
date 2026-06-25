@@ -78,6 +78,7 @@ export const TrashBin: React.FC<TrashBinProps> = ({ isOpen, onClose, triggerRef 
   return (
     <div
       ref={popoverRef}
+      className="animate-slide-up"
       style={{
         position: 'fixed',
         bottom: '20px',
