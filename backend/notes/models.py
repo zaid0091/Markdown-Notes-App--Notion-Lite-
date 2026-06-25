@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from django.core.validators import RegexValidator
 from mptt.models import MPTTModel, MPTTForeignKey
 from django.contrib.postgres.search import SearchVectorField
 
@@ -47,3 +48,33 @@ class Page(MPTTModel):
 
     def __str__(self):
         return self.title or "Untitled"
+
+
+class Tag(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=50)
+    
+    # Enforce standard CSS hex formatting (e.g. #FF5733)
+    color_validator = RegexValidator(
+        regex=r'^#([A-Fa-f0-9]{6})$',
+        message='Color must be a valid 6-character hex code starting with # (e.g. #FF5733).'
+    )
+    color = models.CharField(max_length=7, validators=[color_validator], default="#808080")
+    
+    # Many-to-many relationship mapping tags to notes pages
+    pages = models.ManyToManyField(Page, related_name='tags', blank=True)
+    
+    # User workspace ownership
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='tags'
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('name', 'user')
+
+    def __str__(self):
+        return self.name
