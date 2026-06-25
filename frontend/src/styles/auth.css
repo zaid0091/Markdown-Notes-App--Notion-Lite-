@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-dark: hsl(220, 25%, 8%);
+  --card-bg: hsla(220, 25%, 12%, 0.7);
+  --border-glass: hsla(220, 25%, 22%, 0.6);
+  --text-primary: hsl(210, 20%, 98%);
+  --text-secondary: hsl(215, 15%, 75%);
+  --accent-gradient: linear-gradient(135deg, hsl(265, 85%, 66%), hsl(190, 90%, 55%));
+  --accent-glow: hsla(265, 85%, 66%, 0.35);
+  --input-bg: hsla(220, 25%, 6%, 0.8);
+}
+
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-primary);
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+/* Background ambient glows */
+.auth-container::before,
+.auth-container::after {
+  content: '';
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: 1;
+  opacity: 0.35;
+  pointer-events: none;
+}
+.auth-container::before {
+  background: hsl(265, 85%, 66%);
+  top: -10%;
+  left: -5%;
+}
+.auth-container::after {
+  background: hsl(190, 90%, 55%);
+  bottom: -10%;
+  right: -5%;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  transform: translateY(0);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.auth-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 30px var(--accent-glow);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.auth-logo {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.auth-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 300;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-input {
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.form-input:focus {
+  outline: none;
+  border-color: hsl(190, 90%, 55%);
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15);
+}
+
+.auth-button {
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 4px 15px rgba(123, 31, 162, 0.3);
+  margin-top: 10px;
+}
+.auth-button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(123, 31, 162, 0.4), 0 0 15px rgba(0, 229, 255, 0.4);
+}
+.auth-button:active {
+  transform: scale(0.98);
+}
+.auth-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.auth-error {
+  background-color: rgba(239, 83, 80, 0.15);
+  border: 1px solid rgba(239, 83, 80, 0.4);
+  border-radius: 8px;
+  padding: 12px;
+  color: hsl(0, 85%, 65%);
+  font-size: 0.85rem;
+  font-weight: 400;
+  text-align: center;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.auth-link {
+  color: hsl(190, 90%, 55%);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+.auth-link:hover {
+  color: hsl(265, 85%, 66%);
+  text-decoration: underline;
+}
