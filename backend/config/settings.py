@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
     'users',
 ]
 
@@ -121,3 +123,38 @@ SESSION_COOKIE_HTTPONLY = True
 
 # Custom User Model definition
 AUTH_USER_MODEL = 'users.User'
+
+# REST Framework Configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+# SimpleJWT Configuration
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+
+    # Cookie custom keys for handling refresh token in HttpOnly cookies
+    'AUTH_COOKIE': 'refresh_token',
+    'AUTH_COOKIE_PATH': '/api/auth/',
+    'AUTH_COOKIE_SECURE': False,  # True in production
+    'AUTH_COOKIE_HTTP_ONLY': True,
+    'AUTH_COOKIE_SAME_SITE': 'Lax',
+}
