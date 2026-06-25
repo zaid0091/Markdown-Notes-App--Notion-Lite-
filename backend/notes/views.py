@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -7,6 +8,7 @@ from django.contrib.postgres.search import SearchQuery, SearchRank, SearchHeadli
 
 from .models import Page, Tag
 from .serializers import PageSerializer, TagSerializer, PageTreeSerializer
+from .pdf_generator import generate_pdf
 
 
 class PageViewSet(viewsets.ModelViewSet):
@@ -166,6 +168,22 @@ class PageViewSet(viewsets.ModelViewSet):
             })
 
         return Response(results, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'])
+    def export(self, request, pk=None):
+        page = self.get_object()
+        try:
+            pdf_bytes = generate_pdf(page)
+            response = HttpResponse(pdf_bytes, content_type='application/pdf')
+            # Escape double quotes in filename to prevent header injection or parsing issues
+            filename = f"{page.title or 'Untitled'}.pdf".replace('"', '\\"')
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+        except Exception as e:
+            return Response(
+                {"detail": f"Failed to generate PDF: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class TagViewSet(viewsets.ModelViewSet):

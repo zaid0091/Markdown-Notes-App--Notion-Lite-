@@ -14,7 +14,7 @@ except Exception as e:
     WEASYPRINT_AVAILABLE = False
 
 
-def compile_markdown_to_html(page):
+def compile_markdown_to_html(page, use_weasyprint=WEASYPRINT_AVAILABLE):
     """
     Parses note markdown content into styled HTML structure,
     injecting emojis, cover banners, metadata, and CSS.
@@ -28,25 +28,8 @@ def compile_markdown_to_html(page):
     # Get associated tags
     tags = page.tags.all()
     
-    # Render full HTML template string
-    html_context = {
-        'title': page.title or "Untitled",
-        'content': parsed_content_html,
-        'icon': page.icon,
-        'cover_image_url': page.cover_image.path if page.cover_image else None,
-        'tags': tags,
-        'created_at': page.created_at.strftime("%B %d, %Y at %I:%M %p"),
-        'updated_at': page.updated_at.strftime("%B %d, %Y at %I:%M %p"),
-        'username': page.user.username
-    }
-    
-    html_template = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <title>{{ title }}</title>
-        <style>
+    if use_weasyprint:
+        page_style = """
             @page {
                 size: A4;
                 margin: 20mm;
@@ -57,6 +40,36 @@ def compile_markdown_to_html(page):
                     color: #a0a0a0;
                 }
             }
+        """
+    else:
+        page_style = """
+            @page {
+                size: A4;
+                margin: 20mm;
+            }
+        """
+
+    # Render full HTML template string
+    html_context = {
+        'title': page.title or "Untitled",
+        'content': parsed_content_html,
+        'icon': page.icon,
+        'cover_image_url': page.cover_image.path if page.cover_image else None,
+        'tags': tags,
+        'created_at': page.created_at.strftime("%B %d, %Y at %I:%M %p"),
+        'updated_at': page.updated_at.strftime("%B %d, %Y at %I:%M %p"),
+        'username': page.user.username,
+        'page_style': page_style
+    }
+    
+    html_template = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{ title }}</title>
+        <style>
+            {{ page_style|safe }}
             body {
                 font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
                 color: #2b2b2b;
@@ -192,11 +205,10 @@ def generate_pdf(page):
     Generates a PDF byte stream from a Page note.
     Uses WeasyPrint if available; falls back to xhtml2pdf.
     """
-    html_content = compile_markdown_to_html(page)
-    
     if WEASYPRINT_AVAILABLE:
         try:
             logger.info("Generating PDF using WeasyPrint.")
+            html_content = compile_markdown_to_html(page, use_weasyprint=True)
             pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
             return pdf_bytes
         except Exception as e:
@@ -205,6 +217,7 @@ def generate_pdf(page):
             
     # Fallback to xhtml2pdf (Pure Python, compatible with all Windows installations)
     logger.info("Generating PDF using xhtml2pdf fallback.")
+    html_content = compile_markdown_to_html(page, use_weasyprint=False)
     pdf_buffer = io.BytesIO()
     from xhtml2pdf import pisa
     
