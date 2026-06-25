@@ -165,7 +165,7 @@ SIMPLE_JWT = {
     # Cookie custom keys for handling refresh token in HttpOnly cookies
     'AUTH_COOKIE': 'refresh_token',
     'AUTH_COOKIE_PATH': '/api/auth/',
-    'AUTH_COOKIE_SECURE': False,  # True in production
+    'AUTH_COOKIE_SECURE': env.bool('AUTH_COOKIE_SECURE', default=not DEBUG),
     'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_SAME_SITE': 'Lax',
 }
