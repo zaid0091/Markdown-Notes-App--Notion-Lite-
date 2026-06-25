@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -117,3 +118,6 @@ CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS')
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_HTTPONLY = True
+
+# Custom User Model definition
+AUTH_USER_MODEL = 'users.User'
