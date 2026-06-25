@@ -12,7 +12,11 @@ vi.mock('../hooks/usePages', () => ({
   useCreatePage: vi.fn(),
   useToggleFavorite: vi.fn(),
   useUpdatePage: vi.fn(),
+  useArchivePage: vi.fn(),
+  useRestorePage: vi.fn(),
+  useDeletePage: vi.fn(),
 }));
+
 
 describe('PageTree Component', () => {
   const { mockNavigate } = vi.hoisted(() => ({
@@ -68,6 +72,7 @@ describe('PageTree Component', () => {
   const mockMutateAsyncCreate = vi.fn();
   const mockMutateAsyncFavorite = vi.fn();
   const mockMutateAsyncUpdate = vi.fn();
+  const mockMutateAsyncArchive = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -93,6 +98,18 @@ describe('PageTree Component', () => {
     vi.mocked(hooks.useUpdatePage).mockReturnValue({
       mutateAsync: mockMutateAsyncUpdate,
     } as unknown as ReturnType<typeof hooks.useUpdatePage>);
+
+    vi.mocked(hooks.useArchivePage).mockReturnValue({
+      mutateAsync: mockMutateAsyncArchive,
+    } as unknown as ReturnType<typeof hooks.useArchivePage>);
+
+    vi.mocked(hooks.useRestorePage).mockReturnValue({
+      mutateAsync: vi.fn(),
+    } as unknown as ReturnType<typeof hooks.useRestorePage>);
+
+    vi.mocked(hooks.useDeletePage).mockReturnValue({
+      mutateAsync: vi.fn(),
+    } as unknown as ReturnType<typeof hooks.useDeletePage>);
   });
 
   test('renders favorites and page tree nodes correctly', () => {
@@ -268,4 +285,46 @@ describe('PageTree Component', () => {
       data: { parent: '4' },
     });
   });
+
+  test('allows archiving a page tree node', async () => {
+    render(
+      <MemoryRouter>
+        <PageTree />
+      </MemoryRouter>
+    );
+
+    // Target the archive button for node with ID '1' (Parent Page)
+    const archiveBtn = screen.getByTestId('archive-btn-1');
+    expect(archiveBtn).toBeInTheDocument();
+
+    fireEvent.click(archiveBtn);
+
+    await waitFor(() => {
+      expect(mockMutateAsyncArchive).toHaveBeenCalledWith('1');
+    });
+  });
+
+  test('opens and closes TrashBin popover when clicking Trash button', () => {
+    render(
+      <MemoryRouter>
+        <PageTree />
+      </MemoryRouter>
+    );
+
+    // Verify popover is closed initially
+    expect(screen.queryByTestId('trash-bin-popover')).not.toBeInTheDocument();
+
+    // Click Trash trigger button
+    const trashTrigger = screen.getByTestId('trash-trigger-btn');
+    expect(trashTrigger).toBeInTheDocument();
+    fireEvent.click(trashTrigger);
+
+    // Popover is now visible
+    expect(screen.getByTestId('trash-bin-popover')).toBeInTheDocument();
+
+    // Click again to close
+    fireEvent.click(trashTrigger);
+    expect(screen.queryByTestId('trash-bin-popover')).not.toBeInTheDocument();
+  });
 });
+

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { usePageTree, usePagesList, useCreatePage, useToggleFavorite, useUpdatePage } from '../../hooks/usePages';
+import { usePageTree, usePagesList, useCreatePage, useToggleFavorite, useUpdatePage, useArchivePage } from '../../hooks/usePages';
 import { PageNode } from './PageNode';
+import { TrashBin } from './TrashBin';
 
 export const PageTree: React.FC = () => {
   const { id: activeId } = useParams<{ id: string }>();
@@ -16,6 +17,10 @@ export const PageTree: React.FC = () => {
   const createPageMutation = useCreatePage();
   const toggleFavoriteMutation = useToggleFavorite();
   const updatePageMutation = useUpdatePage();
+  const archivePageMutation = useArchivePage();
+
+  const [isTrashOpen, setIsTrashOpen] = useState(false);
+  const trashTriggerRef = useRef<HTMLButtonElement>(null);
 
   const handleSelectPage = (id: string) => {
     navigate(`/page/${id}`);
@@ -66,6 +71,19 @@ export const PageTree: React.FC = () => {
       console.error('Failed to move page:', error);
     }
   };
+
+  const handleArchivePage = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await archivePageMutation.mutateAsync(id);
+      if (id === activeId) {
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Failed to archive page:', error);
+    }
+  };
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -176,9 +194,11 @@ export const PageTree: React.FC = () => {
                 onToggleFavorite={handleToggleFavorite}
                 allPages={allPages || []}
                 onMove={handleMovePage}
+                onArchive={handleArchivePage}
               />
             ))}
           </div>
+
         ) : (
           <div style={{
             padding: '16px',
@@ -195,7 +215,49 @@ export const PageTree: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Trash Bin trigger button and popover */}
+      <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '10px' }}>
+        <button
+          ref={trashTriggerRef}
+          onClick={() => setIsTrashOpen(!isTrashOpen)}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '6px 8px',
+            borderRadius: '6px',
+            fontSize: '0.875rem',
+            color: 'var(--text-secondary)',
+            cursor: 'pointer',
+            gap: '8px',
+            fontWeight: 500,
+            transition: 'background-color 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+            e.currentTarget.style.color = 'var(--text-primary)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = 'var(--text-secondary)';
+          }}
+          data-testid="trash-trigger-btn"
+        >
+          <span>🗑️</span>
+          <span>Trash</span>
+        </button>
+
+        <TrashBin
+          isOpen={isTrashOpen}
+          onClose={() => setIsTrashOpen(false)}
+          triggerRef={trashTriggerRef}
+        />
+      </div>
     </div>
   );
 };
 export default PageTree;
+

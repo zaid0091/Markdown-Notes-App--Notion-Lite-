@@ -10,6 +10,7 @@ interface PageNodeProps {
   onToggleFavorite: (id: string, e: React.MouseEvent) => void;
   allPages: Page[];
   onMove: (id: string, newParentId: string | null) => void;
+  onArchive: (id: string, e: React.MouseEvent) => void;
 }
 
 export const PageNode: React.FC<PageNodeProps> = ({
@@ -21,6 +22,7 @@ export const PageNode: React.FC<PageNodeProps> = ({
   onToggleFavorite,
   allPages,
   onMove,
+  onArchive,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isRelocating, setIsRelocating] = useState(false);
@@ -258,9 +260,41 @@ export const PageNode: React.FC<PageNodeProps> = ({
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
             </button>
+
+            {/* Archive / Delete Icon */}
+            <button
+              onClick={(e) => onArchive(node.id, e)}
+              title="Archive page"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '2px',
+                cursor: 'pointer',
+                color: 'var(--text-muted)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'transform 0.15s ease, color 0.15s ease',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.2)';
+                e.currentTarget.style.color = '#ef5350';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.color = 'var(--text-muted)';
+              }}
+              data-testid={`archive-btn-${node.id}`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
           </span>
         )}
       </div>
+
 
       {/* Render children recursively */}
       {hasChildren && isExpanded && (
@@ -276,11 +310,13 @@ export const PageNode: React.FC<PageNodeProps> = ({
               onToggleFavorite={onToggleFavorite}
               allPages={allPages}
               onMove={onMove}
+              onArchive={onArchive}
             />
           ))}
         </div>
       )}
     </div>
+
   );
 };
 
