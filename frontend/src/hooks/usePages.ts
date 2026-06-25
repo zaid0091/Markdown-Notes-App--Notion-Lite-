@@ -146,3 +146,25 @@ export const useSearchPages = (query: string) => {
     enabled: query.trim().length > 0,
   });
 };
+
+// Hook: Upload cover image
+export const useUploadCover = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, file }: { id: string; file: File }) => {
+      const formData = new FormData();
+      formData.append('cover_image', file);
+      const response = await client.post<Page>(`/api/pages/${id}/upload-cover/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['pageTree'] });
+      queryClient.invalidateQueries({ queryKey: ['pagesList'] });
+      queryClient.invalidateQueries({ queryKey: ['pageDetails', variables.id] });
+    },
+  });
+};
