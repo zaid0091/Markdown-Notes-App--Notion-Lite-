@@ -9,6 +9,8 @@ env = environ.Env(
     DEBUG=(bool, False),
     SECRET_KEY=(str, 'django-insecure-fallback-secret-key-change-it'),
     ALLOWED_HOSTS=(list, ['*']),
+    CORS_ALLOWED_ORIGINS=(list, []),
+    CORS_ALLOW_CREDENTIALS=(bool, False),
 )
 
 # Read .env file if it exists
@@ -26,9 +28,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Must precede CommonMiddleware
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -95,3 +99,12 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CORS Configuration
+CORS_ALLOW_CREDENTIALS = env('CORS_ALLOW_CREDENTIALS')
+CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS')
+
+# Session and CSRF Cookie Settings for cross-site credentials transmission
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_HTTPONLY = True
