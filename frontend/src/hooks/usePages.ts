@@ -223,3 +223,16 @@ export const useDeleteTag = () => {
     },
   });
 };
+
+// Hook: Export a page as PDF
+export const useExportPDF = () => {
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await client.get(`/api/pages/${id}/export/`, {
+        responseType: 'blob',
+      });
+      return response.data; // Returns Blob object
+    },
+  });
+};
+

@@ -13,6 +13,7 @@ vi.mock('../hooks/usePages', () => ({
   useCreateTag: vi.fn(),
   useUpdateTag: vi.fn(),
   useDeleteTag: vi.fn(),
+  useExportPDF: vi.fn(),
 }));
 
 // Mock emoji picker to keep jsdom clean and execution fast
@@ -45,6 +46,7 @@ describe('PageHeader Component', () => {
   const mockMutateUpdate = vi.fn();
   const mockMutateFavorite = vi.fn();
   const mockMutateAsyncUpload = vi.fn();
+  const mockMutateAsyncExport = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -80,6 +82,10 @@ describe('PageHeader Component', () => {
       mutate: vi.fn(),
       mutateAsync: vi.fn(),
     } as unknown as ReturnType<typeof hooks.useDeleteTag>);
+
+    vi.mocked(hooks.useExportPDF).mockReturnValue({
+      mutateAsync: mockMutateAsyncExport,
+    } as unknown as ReturnType<typeof hooks.useExportPDF>);
   });
 
   test('renders page title, cover image, and emoji correctly', () => {
@@ -209,5 +215,56 @@ describe('PageHeader Component', () => {
 
     expect(screen.getByText('Image exceeds size limit of 5MB.')).toBeInTheDocument();
     expect(mockMutateAsyncUpload).not.toHaveBeenCalled();
+  });
+
+  test('renders export to pdf button', () => {
+    render(<PageHeader page={mockPage} />);
+    expect(screen.getByTitle('Export to PDF')).toBeInTheDocument();
+  });
+
+  test('triggers PDF export download successfully', async () => {
+    const mockCreateObjectURL = vi.fn().mockReturnValue('blob:url');
+    const mockRevokeObjectURL = vi.fn();
+    window.URL.createObjectURL = mockCreateObjectURL;
+    window.URL.revokeObjectURL = mockRevokeObjectURL;
+
+    const mockClick = vi.fn();
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
+      const el = originalCreateElement(tagName);
+      if (tagName === 'a') {
+        el.click = mockClick;
+      }
+      return el;
+    });
+
+    const mockBlob = new Blob(['pdf content'], { type: 'application/pdf' });
+    mockMutateAsyncExport.mockResolvedValue(mockBlob);
+
+    render(<PageHeader page={mockPage} />);
+
+    const exportBtn = screen.getByTitle('Export to PDF');
+    fireEvent.click(exportBtn);
+
+    expect(exportBtn).toHaveAttribute('title', 'Exporting to PDF...');
+
+    await waitFor(() => {
+      expect(mockMutateAsyncExport).toHaveBeenCalledWith('page-123');
+      expect(mockCreateObjectURL).toHaveBeenCalledWith(mockBlob);
+      expect(mockClick).toHaveBeenCalled();
+    });
+  });
+
+  test('shows error banner when PDF export fails', async () => {
+    mockMutateAsyncExport.mockRejectedValue(new Error('Export failed'));
+
+    render(<PageHeader page={mockPage} />);
+
+    const exportBtn = screen.getByTitle('Export to PDF');
+    fireEvent.click(exportBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText('Failed to export PDF.')).toBeInTheDocument();
+    });
   });
 });

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import type { Page } from '../../types';
-import { useUpdatePage, useToggleFavorite, useUploadCover } from '../../hooks/usePages';
+import { useUpdatePage, useToggleFavorite, useUploadCover, useExportPDF } from '../../hooks/usePages';
 import TagSelector from '../tags/TagSelector';
 
 interface PageHeaderProps {
@@ -13,11 +13,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ page }) => {
   const updatePageMutation = useUpdatePage();
   const toggleFavoriteMutation = useToggleFavorite();
   const uploadCoverMutation = useUploadCover();
+  const exportPDFMutation = useExportPDF();
 
   const [title, setTitle] = useState(page.title);
   const [prevTitle, setPrevTitle] = useState(page.title);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -113,6 +115,28 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ page }) => {
       data: { cover_image: null },
     });
   };
+
+  const handleExportPDF = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    setErrorMessage(null);
+    try {
+      const blob = await exportPDFMutation.mutateAsync(page.id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${page.title || 'Untitled'}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      setErrorMessage('Failed to export PDF.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
 
   const getCoverUrl = (url: string | null) => {
     if (!url) return '';
@@ -243,6 +267,82 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ page }) => {
         padding: '0 54px',
         position: 'relative',
       }}>
+        {/* PDF Export Trigger Button */}
+        <button
+          onClick={handleExportPDF}
+          disabled={isExporting}
+          title={isExporting ? 'Exporting to PDF...' : 'Export to PDF'}
+          style={{
+            position: 'absolute',
+            top: hasCover ? '-15px' : '10px',
+            right: '94px',
+            background: 'transparent',
+            border: 'none',
+            cursor: isExporting ? 'default' : 'pointer',
+            padding: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--text-muted)',
+            transition: 'transform 0.15s ease, color 0.15s ease',
+            opacity: isExporting ? 0.5 : 1,
+          }}
+          onMouseOver={(e) => {
+            if (!isExporting) {
+              e.currentTarget.style.transform = 'scale(1.2)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }
+          }}
+          onMouseOut={(e) => {
+            if (!isExporting) {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.color = 'var(--text-muted)';
+            }
+          }}
+        >
+          {isExporting ? (
+            <svg
+              style={{
+                animation: 'spin 1s linear infinite',
+              }}
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="12" y1="2" x2="12" y2="6"></line>
+              <line x1="12" y1="18" x2="12" y2="22"></line>
+              <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+              <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+              <line x1="2" y1="12" x2="6" y2="12"></line>
+              <line x1="18" y1="12" x2="22" y2="12"></line>
+              <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+              <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          )}
+        </button>
+
         {/* Favorite Icon (Absolute Positioned at top-right of the info region) */}
         <button
           onClick={handleToggleFavorite}
@@ -268,6 +368,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ page }) => {
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
           </svg>
         </button>
+
 
         {/* Emoji Button Region */}
         <div style={{
