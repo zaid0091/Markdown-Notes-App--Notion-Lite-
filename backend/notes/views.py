@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchHeadline
 
 from .models import Page, Tag
 from .serializers import PageSerializer, TagSerializer, PageTreeSerializer
@@ -111,6 +112,60 @@ class PageViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(page)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='search')
+    def search(self, request):
+        query_str = request.query_params.get('q', '').strip()
+        if not query_str:
+            return Response([], status=status.HTTP_200_OK)
+
+        # Build PostgreSQL Full-Text Search structures
+        search_query = SearchQuery(query_str, config='english')
+        
+        # Query search matches using trigger-synchronized index and calculate ranking
+        queryset = self.get_queryset().filter(
+            is_archived=False,
+            search_vector=search_query
+        ).annotate(
+            rank=SearchRank('search_vector', search_query)
+        )
+
+        # Generate HTML-styled highlight annotations for matching text snippets
+        queryset = queryset.annotate(
+            headline_title=SearchHeadline(
+                'title',
+                search_query,
+                start_sel='<mark class="highlight">',
+                stop_sel='</mark>',
+                highlight_all=True
+            ),
+            headline_content=SearchHeadline(
+                'content',
+                search_query,
+                start_sel='<mark class="highlight">',
+                stop_sel='</mark>',
+                max_words=35,
+                min_words=15
+            )
+        ).order_by('-rank')
+
+        # Map results with highlights
+        results = []
+        for page in queryset:
+            results.append({
+                'id': str(page.id),
+                'title': page.title,
+                'icon': page.icon,
+                'cover_image': page.cover_image.url if page.cover_image else None,
+                'is_favorite': page.is_favorite,
+                'created_at': page.created_at,
+                'updated_at': page.updated_at,
+                'highlighted_title': page.headline_title,
+                'highlighted_content': page.headline_content,
+                'rank': page.rank,
+            })
+
+        return Response(results, status=status.HTTP_200_OK)
 
 
 class TagViewSet(viewsets.ModelViewSet):
