@@ -77,7 +77,7 @@ export const PageTree: React.FC = () => {
     try {
       await archivePageMutation.mutateAsync(id);
       if (id === activeId) {
-        navigate('/');
+        navigate('/workspace');
       }
     } catch (error) {
       console.error('Failed to archive page:', error);

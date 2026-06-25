@@ -23,7 +23,7 @@ const LoginPage: React.FC = () => {
 
     try {
       await login(email, password);
-      navigate('/');
+      navigate('/workspace');
     } catch (err) {
       const errorWithResponse = err as { response?: { data?: LoginErrorResponse } };
       const responseData = errorWithResponse.response?.data;

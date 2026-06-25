@@ -37,7 +37,7 @@ const RegisterPage: React.FC = () => {
       await register(username, email, password);
       // 2. Auto login
       await login(email, password);
-      navigate('/');
+      navigate('/workspace');
     } catch (err) {
       const errorWithResponse = err as { response?: { data?: RegisterErrorResponse } };
       const responseData = errorWithResponse.response?.data;

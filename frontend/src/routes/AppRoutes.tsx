@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import NotePage from '../pages/NotePage';
+import LandingPage from '../pages/LandingPage';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isRestoringSession } = useAuth();
@@ -35,13 +36,23 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/workspace" replace />;
   }
 
   return <>{children}</>;
 };
 
 export const AppRoutes: React.FC = () => {
+  const { isAuthenticated, isRestoringSession } = useAuth();
+
+  if (isRestoringSession) {
+    return (
+      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontFamily: 'sans-serif', color: '#666' }}>Loading session...</div>
+      </div>
+    );
+  }
+
   return (
     <BrowserRouter>
       <Routes>
@@ -63,6 +74,10 @@ export const AppRoutes: React.FC = () => {
         />
         <Route
           path="/"
+          element={<LandingPage />}
+        />
+        <Route
+          path="/workspace"
           element={
             <ProtectedRoute>
               <NotePage />
@@ -77,8 +92,10 @@ export const AppRoutes: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/workspace" : "/"} replace />} />
       </Routes>
     </BrowserRouter>
   );
 };
+
+
