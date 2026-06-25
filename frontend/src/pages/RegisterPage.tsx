@@ -38,8 +38,9 @@ const RegisterPage: React.FC = () => {
       // 2. Auto login
       await login(email, password);
       navigate('/');
-    } catch (err: any) {
-      const responseData = err.response?.data as RegisterErrorResponse | undefined;
+    } catch (err) {
+      const errorWithResponse = err as { response?: { data?: RegisterErrorResponse } };
+      const responseData = errorWithResponse.response?.data;
       
       let errMessage = 'Registration failed. Please check inputs.';
       if (responseData) {

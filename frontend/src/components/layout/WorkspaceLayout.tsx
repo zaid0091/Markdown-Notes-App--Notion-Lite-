@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { ThemeToggle } from '../common/ThemeToggle';
+import { PageTree } from '../sidebar/PageTree';
 
 export const WorkspaceLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout, isRestoringSession } = useAuth();
@@ -58,19 +59,14 @@ export const WorkspaceLayout: React.FC<{ children: React.ReactNode }> = ({ child
             Workspace: <strong>{user?.username}</strong>
           </div>
           
-          {/* Sidebar Navigation Placeholder */}
-          <nav id="sidebar-nav-container">
-            {/* Will contain collapsible page tree in next phases */}
-            <div style={{
-              padding: '12px',
-              fontSize: '0.85rem',
-              color: 'var(--text-muted)',
-              border: '1px dashed var(--border-color)',
-              borderRadius: '6px',
-              textAlign: 'center'
-            }}>
-              [Sidebar Navigator]
-            </div>
+          {/* Sidebar Navigation containing Collapsible Page Tree */}
+          <nav id="sidebar-nav-container" style={{
+            maxHeight: 'calc(100vh - 200px)',
+            overflowY: 'auto',
+            marginRight: '-10px',
+            paddingRight: '10px'
+          }}>
+            <PageTree />
           </nav>
         </div>
         

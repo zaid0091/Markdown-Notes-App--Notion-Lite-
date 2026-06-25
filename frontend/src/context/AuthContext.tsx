@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect } from 'react';
 import { client } from '../api/client';
 import { setToken } from '../api/tokenStore';
@@ -40,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (active) {
           setUser(profileResponse.data);
         }
-      } catch (error) {
+      } catch {
         // Failed to recover session, clear token store
         setToken(null);
         if (active) {
@@ -94,7 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       await client.post('/api/auth/logout/');
-    } catch (error) {
+    } catch {
       // Proceed with local cleanup even if server request fails
     } finally {
       setToken(null);

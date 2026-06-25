@@ -49,3 +49,15 @@ textarea:focus-visible {
   display: flex;
   flex-direction: column;
 }
+
+/* Sidebar Node Hover Actions */
+.sidebar-node-row .node-actions {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.sidebar-node-row:hover .node-actions {
+  opacity: 1;
+  pointer-events: auto;
+}

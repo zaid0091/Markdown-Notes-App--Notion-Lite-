@@ -24,8 +24,9 @@ const LoginPage: React.FC = () => {
     try {
       await login(email, password);
       navigate('/');
-    } catch (err: any) {
-      const responseData = err.response?.data as LoginErrorResponse | undefined;
+    } catch (err) {
+      const errorWithResponse = err as { response?: { data?: LoginErrorResponse } };
+      const responseData = errorWithResponse.response?.data;
       setError(
         responseData?.detail ||
           responseData?.non_field_errors?.[0] ||
