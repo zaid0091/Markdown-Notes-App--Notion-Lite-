@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { ThemeToggle } from '../common/ThemeToggle';
 import { PageTree } from '../sidebar/PageTree';
+import { SearchPalette } from '../search/SearchPalette';
 
 export const WorkspaceLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout, isRestoringSession } = useAuth();
@@ -108,6 +109,9 @@ export const WorkspaceLayout: React.FC<{ children: React.ReactNode }> = ({ child
       }}>
         {children}
       </div>
+
+      {/* Global Omnibar Search Overlay */}
+      <SearchPalette />
     </div>
   );
 };
