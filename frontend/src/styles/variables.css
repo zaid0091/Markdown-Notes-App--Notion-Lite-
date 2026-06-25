@@ -1,0 +1,54 @@
+/* Color tokens and theme variables */
+:root {
+  /* Light Theme Colors (Default) */
+  --bg-primary-rgb: 255, 255, 255;
+  --bg-primary: rgb(var(--bg-primary-rgb));
+  --bg-secondary-rgb: 247, 247, 248;
+  --bg-secondary: rgb(var(--bg-secondary-rgb));
+  --bg-sidebar: #fbfbfa;
+  
+  --border-color: #e9e9e7;
+  --border-glass: rgba(55, 53, 47, 0.08);
+  
+  --text-primary: #37352f;
+  --text-secondary: #7a7872;
+  --text-muted: #9f9d97;
+  
+  --accent-color: #7b1fa2; /* Purple */
+  --accent-light: rgba(123, 31, 162, 0.08);
+  --accent-gradient: linear-gradient(135deg, hsl(265, 80%, 60%), hsl(190, 80%, 50%));
+  
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 24px rgba(0,0,0,0.12);
+  
+  --scrollbar-thumb: rgba(15, 15, 15, 0.15);
+  --scrollbar-hover: rgba(15, 15, 15, 0.3);
+}
+
+[data-theme='dark'] {
+  /* Dark Theme Colors */
+  --bg-primary-rgb: 24, 26, 27;
+  --bg-primary: rgb(var(--bg-primary-rgb));
+  --bg-secondary-rgb: 31, 34, 36;
+  --bg-secondary: rgb(var(--bg-secondary-rgb));
+  --bg-sidebar: #1c1e20;
+  
+  --border-color: #2d3134;
+  --border-glass: rgba(232, 230, 227, 0.08);
+  
+  --text-primary: #e8e6e3;
+  --text-secondary: #a8a095;
+  --text-muted: #7a7266;
+  
+  --accent-color: #ab47bc;
+  --accent-light: rgba(171, 71, 188, 0.12);
+  --accent-gradient: linear-gradient(135deg, hsl(265, 85%, 66%), hsl(190, 90%, 55%));
+  
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 24px rgba(0,0,0,0.5);
+  
+  --scrollbar-thumb: rgba(255, 255, 255, 0.12);
+  --scrollbar-hover: rgba(255, 255, 255, 0.24);
+}
