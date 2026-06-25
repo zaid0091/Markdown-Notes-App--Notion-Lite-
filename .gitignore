@@ -1,0 +1,32 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+*.env.local
+db.sqlite3
+media/
+staticfiles/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Node / Vite
+node_modules/
+dist/
+dist-ssr/
+*.local
+.eslintcache
+.vitestcache
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDEs & System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
