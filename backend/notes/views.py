@@ -76,6 +76,42 @@ class PageViewSet(viewsets.ModelViewSet):
                 
         return Response(root_nodes, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['post'], url_path='upload-cover')
+    def upload_cover(self, request, pk=None):
+        page = self.get_object()
+        file_obj = request.FILES.get('cover_image')
+        
+        if not file_obj:
+            return Response(
+                {"detail": "No image file provided in key 'cover_image'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Enforce file size limit: 5MB
+        if file_obj.size > 5 * 1024 * 1024:
+            return Response(
+                {"detail": "File size exceeds limit of 5MB."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Enforce file format whitelist: JPEG, PNG, WEBP
+        content_type = file_obj.content_type
+        if content_type not in ['image/jpeg', 'image/png', 'image/webp']:
+            return Response(
+                {"detail": "Only JPEG, PNG, and WEBP image formats are supported."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Clean up previous cover image to prevent media files accumulation
+        if page.cover_image:
+            page.cover_image.delete(save=False)
+            
+        page.cover_image = file_obj
+        page.save()
+        
+        serializer = self.get_serializer(page)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
