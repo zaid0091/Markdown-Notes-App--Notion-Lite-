@@ -3,7 +3,6 @@ import { TrashBin } from '../components/sidebar/TrashBin';
 import { vi, expect, test, describe, beforeEach } from 'vitest';
 import * as hooks from '../hooks/usePages';
 import type { Page } from '../types';
-import React from 'react';
 
 // Mock hooks
 vi.mock('../hooks/usePages', () => ({
