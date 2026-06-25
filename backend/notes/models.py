@@ -2,7 +2,7 @@ import uuid
 from django.db import models
 from django.conf import settings
 from django.core.validators import RegexValidator
-from mptt.models import MPTTModel, MPTTForeignKey
+from mptt.models import MPTTModel, TreeForeignKey
 from django.contrib.postgres.search import SearchVectorField
 
 
@@ -12,7 +12,7 @@ class Page(MPTTModel):
     content = models.TextField(blank=True, default="")
     
     # MPTT Recursive self-relationship
-    parent = MPTTForeignKey(
+    parent = TreeForeignKey(
         'self',
         on_delete=models.CASCADE,
         null=True,
