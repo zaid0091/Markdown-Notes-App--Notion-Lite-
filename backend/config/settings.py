@@ -11,6 +11,11 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, ['*']),
     CORS_ALLOWED_ORIGINS=(list, []),
     CORS_ALLOW_CREDENTIALS=(bool, False),
+    DB_NAME=(str, 'markdown_notes'),
+    DB_USER=(str, 'postgres'),
+    DB_PASSWORD=(str, 'postgres'),
+    DB_HOST=(str, 'localhost'),
+    DB_PORT=(str, '5432'),
 )
 
 # Read .env file if it exists
@@ -63,11 +68,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
-# Database configuration will be detailed in Phase 4 (PostgreSQL integration), using SQLite for boot stability
+# PostgreSQL Database Integration
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT'),
     }
 }
 
