@@ -89,4 +89,51 @@ describe('EditorPane Component', () => {
 
     expect(screen.getByText('All changes saved')).toBeInTheDocument();
   });
+
+  test('shows Notion-style SlashMenu when typing slash and handles command selection', () => {
+    render(<EditorPane page={mockPage} />);
+
+    const textarea = screen.getByPlaceholderText(/Start writing in Markdown/i) as HTMLTextAreaElement;
+    textarea.focus();
+
+    // Set value to include a slash at the end
+    fireEvent.change(textarea, {
+      target: { value: 'Initial markdown content.\n/', selectionStart: 27 },
+    });
+
+    // SlashMenu should pop up and display Heading commands
+    expect(screen.getByText('Heading 1')).toBeInTheDocument();
+    expect(screen.getByText('Heading 2')).toBeInTheDocument();
+    expect(screen.getByText('Code Block')).toBeInTheDocument();
+
+    // Select Heading 2 option by clicking on it
+    const h2Option = screen.getByText('Heading 2');
+    fireEvent.click(h2Option);
+
+    // Value should be replaced by '## '
+    expect(textarea.value).toBe('Initial markdown content.\n## ');
+  });
+
+  test('handles keyboard arrow keys and enter key navigation in SlashMenu', () => {
+    render(<EditorPane page={mockPage} />);
+
+    const textarea = screen.getByPlaceholderText(/Start writing in Markdown/i) as HTMLTextAreaElement;
+    textarea.focus();
+
+    // Set value to include a slash
+    fireEvent.change(textarea, {
+      target: { value: 'test /', selectionStart: 6 },
+    });
+
+    // Press ArrowDown to select Heading 2
+    fireEvent.keyDown(textarea, { key: 'ArrowDown' });
+    // Press ArrowDown to select Heading 3
+    fireEvent.keyDown(textarea, { key: 'ArrowDown' });
+    
+    // Press Enter to confirm selection
+    fireEvent.keyDown(textarea, { key: 'Enter' });
+
+    // The text should be replaced with Heading 3 template: '### '
+    expect(textarea.value).toBe('test ### ');
+  });
 });
