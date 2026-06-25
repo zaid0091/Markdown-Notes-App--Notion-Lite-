@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Page, Tag
-from .serializers import PageSerializer, TagSerializer
+from .serializers import PageSerializer, TagSerializer, PageTreeSerializer
 
 
 class PageViewSet(viewsets.ModelViewSet):
@@ -44,6 +44,37 @@ class PageViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_200_OK
         )
+
+    @action(detail=False, methods=['get'])
+    def tree(self, request):
+        # Fetch all active notes for the requesting user ordered by django-mptt defaults
+        pages = self.get_queryset().filter(is_archived=False).order_by('tree_id', 'lft')
+        
+        # Serialize database entries
+        serialized = {
+            str(p.id): {
+                'id': str(p.id),
+                'title': p.title,
+                'icon': p.icon,
+                'is_favorite': p.is_favorite,
+                'parent': str(p.parent_id) if p.parent_id else None,
+                'children': []
+            }
+            for p in pages
+        }
+        
+        root_nodes = []
+        for p in pages:
+            node_id = str(p.id)
+            node = serialized[node_id]
+            parent_id = node['parent']
+            if parent_id and parent_id in serialized:
+                serialized[parent_id]['children'].append(node)
+            else:
+                # If parent does not exist or is archived, treat as root node
+                root_nodes.append(node)
+                
+        return Response(root_nodes, status=status.HTTP_200_OK)
 
 
 class TagViewSet(viewsets.ModelViewSet):

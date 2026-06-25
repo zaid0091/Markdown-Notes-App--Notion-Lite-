@@ -87,3 +87,9 @@ class PageSerializer(serializers.ModelSerializer):
                 tag.pages.add(page)
                 
         return page
+
+
+class PageTreeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Page
+        fields = ('id', 'title', 'icon', 'is_favorite')
