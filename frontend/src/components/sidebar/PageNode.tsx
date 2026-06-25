@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { PageTreeNode } from '../../types';
+import type { Page, PageTreeNode } from '../../types';
 
 interface PageNodeProps {
   node: PageTreeNode;
@@ -8,6 +8,8 @@ interface PageNodeProps {
   onSelect: (id: string) => void;
   onCreateChild: (parentId: string) => void;
   onToggleFavorite: (id: string, e: React.MouseEvent) => void;
+  allPages: Page[];
+  onMove: (id: string, newParentId: string | null) => void;
 }
 
 export const PageNode: React.FC<PageNodeProps> = ({
@@ -17,14 +19,43 @@ export const PageNode: React.FC<PageNodeProps> = ({
   onSelect,
   onCreateChild,
   onToggleFavorite,
+  allPages,
+  onMove,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [isRelocating, setIsRelocating] = useState(false);
+  
   const isActive = node.id === activeId;
   const hasChildren = node.children && node.children.length > 0;
 
   const handleToggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsExpanded(!isExpanded);
+  };
+
+  // Helper to recursively get all descendant IDs to prevent cyclic parenting
+  const getDescendantIds = (currentNode: PageTreeNode): string[] => {
+    const ids: string[] = [];
+    const traverse = (n: PageTreeNode) => {
+      ids.push(n.id);
+      if (n.children) {
+        n.children.forEach(traverse);
+      }
+    };
+    if (currentNode.children) {
+      currentNode.children.forEach(traverse);
+    }
+    return ids;
+  };
+
+  const descendantIds = getDescendantIds(node);
+  const eligibleParents = allPages.filter(
+    (p) => p.id !== node.id && !descendantIds.includes(p.id)
+  );
+
+  const handleMove = (newParentId: string | null) => {
+    onMove(node.id, newParentId);
+    setIsRelocating(false);
   };
 
   return (
@@ -82,73 +113,153 @@ export const PageNode: React.FC<PageNodeProps> = ({
           )}
         </span>
 
-        {/* Node Title */}
-        <span style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          flexGrow: 1,
-        }}>
-          {node.title || 'Untitled'}
-        </span>
+        {/* Node Title or Relocation Inline Dropdown */}
+        {isRelocating ? (
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', flexGrow: 1 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <select
+              value={node.parent || ''}
+              onChange={(e) => handleMove(e.target.value || null)}
+              style={{
+                flexGrow: 1,
+                background: 'var(--bg-secondary)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                padding: '2px',
+                fontSize: '0.8rem',
+                maxWidth: '120px',
+              }}
+            >
+              <option value="">Move to Root</option>
+              {eligibleParents.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.title || 'Untitled'}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => setIsRelocating(false)}
+              title="Cancel"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--text-muted)',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '2px',
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        ) : (
+          <span style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            flexGrow: 1,
+          }}>
+            {node.title || 'Untitled'}
+          </span>
+        )}
 
         {/* Action icons (revealed on hover) */}
-        <span className="node-actions" style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px',
-          marginLeft: '8px',
-        }}>
-          {/* Favorite Toggle Icon */}
-          <button
-            onClick={(e) => onToggleFavorite(node.id, e)}
-            title={node.is_favorite ? 'Remove from Favorites' : 'Add to Favorites'}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: '2px',
-              cursor: 'pointer',
-              color: node.is_favorite ? '#ffb300' : 'var(--text-muted)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'transform 0.15s ease',
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.2)')}
-            onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill={node.is_favorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-            </svg>
-          </button>
+        {!isRelocating && (
+          <span className="node-actions" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            marginLeft: '8px',
+          }}>
+            {/* Favorite Toggle Icon */}
+            <button
+              onClick={(e) => onToggleFavorite(node.id, e)}
+              title={node.is_favorite ? 'Remove from Favorites' : 'Add to Favorites'}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '2px',
+                cursor: 'pointer',
+                color: node.is_favorite ? '#ffb300' : 'var(--text-muted)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'transform 0.15s ease',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.2)')}
+              onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill={node.is_favorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </button>
 
-          {/* Add Child Page Icon */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onCreateChild(node.id);
-            }}
-            title="Create sub-page inside"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: '2px',
-              cursor: 'pointer',
-              color: 'var(--text-secondary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'transform 0.15s ease',
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.2)')}
-            onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-          </button>
-        </span>
+            {/* Relocation Move Icon */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsRelocating(true);
+              }}
+              title="Move page"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '2px',
+                cursor: 'pointer',
+                color: 'var(--text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'transform 0.15s ease',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.2)')}
+              onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="5 9 2 12 5 15"></polyline>
+                <polyline points="9 5 12 2 15 5"></polyline>
+                <polyline points="15 19 12 22 9 19"></polyline>
+                <polyline points="19 9 22 12 19 15"></polyline>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <line x1="12" y1="2" x2="12" y2="22"></line>
+              </svg>
+            </button>
+
+            {/* Add Child Page Icon */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onCreateChild(node.id);
+              }}
+              title="Create sub-page inside"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '2px',
+                cursor: 'pointer',
+                color: 'var(--text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'transform 0.15s ease',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.2)')}
+              onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+          </span>
+        )}
       </div>
 
       {/* Render children recursively */}
@@ -163,6 +274,8 @@ export const PageNode: React.FC<PageNodeProps> = ({
               onSelect={onSelect}
               onCreateChild={onCreateChild}
               onToggleFavorite={onToggleFavorite}
+              allPages={allPages}
+              onMove={onMove}
             />
           ))}
         </div>
@@ -170,4 +283,5 @@ export const PageNode: React.FC<PageNodeProps> = ({
     </div>
   );
 };
+
 export default PageNode;

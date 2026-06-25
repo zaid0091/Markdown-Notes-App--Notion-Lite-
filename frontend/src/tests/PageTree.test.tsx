@@ -11,21 +11,22 @@ vi.mock('../hooks/usePages', () => ({
   usePagesList: vi.fn(),
   useCreatePage: vi.fn(),
   useToggleFavorite: vi.fn(),
+  useUpdatePage: vi.fn(),
 }));
 
 describe('PageTree Component', () => {
-const { mockNavigate } = vi.hoisted(() => ({
-  mockNavigate: vi.fn(),
-}));
+  const { mockNavigate } = vi.hoisted(() => ({
+    mockNavigate: vi.fn(),
+  }));
 
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-    useParams: () => ({ id: '1' }),
-  };
-});
+  vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');
+    return {
+      ...actual,
+      useNavigate: () => mockNavigate,
+      useParams: () => ({ id: '1' }),
+    };
+  });
 
   const mockTreeNodes: PageTreeNode[] = [
     {
@@ -60,12 +61,13 @@ vi.mock('react-router-dom', async () => {
       created_at: '',
       updated_at: '',
       tags: [],
-      user: 0
+      user: 0,
     },
   ];
 
   const mockMutateAsyncCreate = vi.fn();
   const mockMutateAsyncFavorite = vi.fn();
+  const mockMutateAsyncUpdate = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -87,6 +89,10 @@ vi.mock('react-router-dom', async () => {
     vi.mocked(hooks.useToggleFavorite).mockReturnValue({
       mutateAsync: mockMutateAsyncFavorite,
     } as unknown as ReturnType<typeof hooks.useToggleFavorite>);
+
+    vi.mocked(hooks.useUpdatePage).mockReturnValue({
+      mutateAsync: mockMutateAsyncUpdate,
+    } as unknown as ReturnType<typeof hooks.useUpdatePage>);
   });
 
   test('renders favorites and page tree nodes correctly', () => {
@@ -180,5 +186,86 @@ vi.mock('react-router-dom', async () => {
     fireEvent.click(favoriteBtns[0]);
 
     expect(mockMutateAsyncFavorite).toHaveBeenCalledWith('1');
+  });
+
+  test('allows moving a page and prevents circular selection', async () => {
+    const mockAllPages: Page[] = [
+      {
+        id: '1',
+        title: 'Parent Page',
+        content: '',
+        parent: null,
+        icon: null,
+        cover_image: null,
+        is_favorite: false,
+        is_archived: false,
+        created_at: '',
+        updated_at: '',
+        tags: [],
+        user: 1,
+      },
+      {
+        id: '2',
+        title: 'Child Page',
+        content: '',
+        parent: '1',
+        icon: null,
+        cover_image: null,
+        is_favorite: false,
+        is_archived: false,
+        created_at: '',
+        updated_at: '',
+        tags: [],
+        user: 1,
+      },
+      {
+        id: '4',
+        title: 'Another Root Page',
+        content: '',
+        parent: null,
+        icon: null,
+        cover_image: null,
+        is_favorite: false,
+        is_archived: false,
+        created_at: '',
+        updated_at: '',
+        tags: [],
+        user: 1,
+      },
+    ];
+
+    vi.mocked(hooks.usePagesList).mockImplementation((filters) => {
+      if (filters?.is_favorite) {
+        return { data: mockFavoritePages, isLoading: false } as unknown as ReturnType<typeof hooks.usePagesList>;
+      }
+      return { data: mockAllPages, isLoading: false } as unknown as ReturnType<typeof hooks.usePagesList>;
+    });
+
+    render(
+      <MemoryRouter>
+        <PageTree />
+      </MemoryRouter>
+    );
+
+    const moveButtons = screen.getAllByTitle('Move page');
+    fireEvent.click(moveButtons[0]); // Click Move on Parent Page
+
+    const selectDropdown = screen.getByRole('combobox');
+    expect(selectDropdown).toBeInTheDocument();
+
+    const options = screen.getAllByRole('option') as HTMLOptionElement[];
+    const optionValues = options.map((opt) => opt.value);
+
+    expect(optionValues).toContain('');
+    expect(optionValues).toContain('4');
+    expect(optionValues).not.toContain('1');
+    expect(optionValues).not.toContain('2');
+
+    fireEvent.change(selectDropdown, { target: { value: '4' } });
+
+    expect(mockMutateAsyncUpdate).toHaveBeenCalledWith({
+      id: '1',
+      data: { parent: '4' },
+    });
   });
 });

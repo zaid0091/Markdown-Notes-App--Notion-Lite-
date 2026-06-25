@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { usePageTree, usePagesList, useCreatePage, useToggleFavorite } from '../../hooks/usePages';
+import { usePageTree, usePagesList, useCreatePage, useToggleFavorite, useUpdatePage } from '../../hooks/usePages';
 import { PageNode } from './PageNode';
 
 export const PageTree: React.FC = () => {
@@ -10,10 +10,12 @@ export const PageTree: React.FC = () => {
   // Queries
   const { data: treeNodes, isLoading: isTreeLoading } = usePageTree();
   const { data: favoritePages } = usePagesList({ is_favorite: true, is_archived: false });
+  const { data: allPages } = usePagesList({ is_archived: false });
 
   // Mutations
   const createPageMutation = useCreatePage();
   const toggleFavoriteMutation = useToggleFavorite();
+  const updatePageMutation = useUpdatePage();
 
   const handleSelectPage = (id: string) => {
     navigate(`/page/${id}`);
@@ -51,6 +53,17 @@ export const PageTree: React.FC = () => {
       await toggleFavoriteMutation.mutateAsync(id);
     } catch (error) {
       console.error('Failed to toggle favorite:', error);
+    }
+  };
+
+  const handleMovePage = async (id: string, newParentId: string | null) => {
+    try {
+      await updatePageMutation.mutateAsync({
+        id,
+        data: { parent: newParentId },
+      });
+    } catch (error) {
+      console.error('Failed to move page:', error);
     }
   };
 
@@ -161,6 +174,8 @@ export const PageTree: React.FC = () => {
                 onSelect={handleSelectPage}
                 onCreateChild={handleCreateChildPage}
                 onToggleFavorite={handleToggleFavorite}
+                allPages={allPages || []}
+                onMove={handleMovePage}
               />
             ))}
           </div>
