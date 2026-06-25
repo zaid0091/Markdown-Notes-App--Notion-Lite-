@@ -25,6 +25,19 @@ class PageViewSet(viewsets.ModelViewSet):
         # Automatically assign the request user as the workspace page owner
         serializer.save(user=self.request.user)
 
+    def perform_update(self, serializer):
+        instance = serializer.instance
+        old_is_archived = instance.is_archived
+        
+        # Save updated instance
+        page = serializer.save()
+        
+        # Cascade archive status to descendants if it changed
+        if old_is_archived != page.is_archived:
+            from django.db import transaction
+            with transaction.atomic():
+                page.get_descendants().update(is_archived=page.is_archived)
+
     def destroy(self, request, *args, **kwargs):
         # Prevent accidental data loss: pages must be soft-deleted (archived) first before deletion
         page = self.get_object()
@@ -184,6 +197,34 @@ class PageViewSet(viewsets.ModelViewSet):
                 {"detail": f"Failed to generate PDF: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+    @action(detail=True, methods=['post'])
+    def archive(self, request, pk=None):
+        page = self.get_object()
+        if page.is_archived:
+            return Response({"detail": "Page is already archived."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        from django.db import transaction
+        with transaction.atomic():
+            page.is_archived = True
+            page.save()
+            page.get_descendants().update(is_archived=True)
+            
+        return Response({"status": "page and descendants archived"}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def restore(self, request, pk=None):
+        page = self.get_object()
+        if not page.is_archived:
+            return Response({"detail": "Page is not archived."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        from django.db import transaction
+        with transaction.atomic():
+            page.is_archived = False
+            page.save()
+            page.get_descendants().update(is_archived=False)
+            
+        return Response({"status": "page and descendants restored"}, status=status.HTTP_200_OK)
 
 
 class TagViewSet(viewsets.ModelViewSet):
