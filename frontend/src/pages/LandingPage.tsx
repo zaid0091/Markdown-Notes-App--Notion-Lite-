@@ -9,6 +9,30 @@ export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   
+  // Subscription plans state
+  const [currentPlan, setCurrentPlan] = useState<string>('free');
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const savedPlan = localStorage.getItem('user_plan') || 'free';
+      setCurrentPlan(savedPlan);
+    } else {
+      setCurrentPlan('');
+    }
+  }, [isAuthenticated]);
+
+  const handleSelectPlan = (planName: string) => {
+    if (!isAuthenticated) {
+      navigate('/register');
+      return;
+    }
+    
+    // Set new plan in localStorage to simulate subscription
+    localStorage.setItem('user_plan', planName);
+    setCurrentPlan(planName);
+    navigate('/workspace');
+  };
+
   // Set landing page document title on mount
   useEffect(() => {
     document.title = "Notion Lite | Next-Gen Markdown Workspace";
@@ -605,11 +629,14 @@ const notionLite = {
                 Export to PDF (Watermarked)
               </li>
             </ul>
-            <button className="btn btn-secondary w-full" onClick={() => navigate(isAuthenticated ? '/workspace' : '/register')}>
-              Get Started
+            <button 
+              className={`btn w-full ${currentPlan === 'free' ? 'btn-outline active-plan' : 'btn-secondary'}`}
+              onClick={() => handleSelectPlan('free')}
+            >
+              {!isAuthenticated ? 'Get Started' : currentPlan === 'free' ? 'Current Plan' : 'Downgrade to Free'}
             </button>
           </div>
-
+ 
           <div className="pricing-card featured">
             <div className="featured-badge">RECOMMENDED</div>
             <div className="pricing-header">
@@ -643,11 +670,14 @@ const notionLite = {
                 No PDF watermarks
               </li>
             </ul>
-            <button className="btn btn-primary w-full" onClick={() => navigate(isAuthenticated ? '/workspace' : '/register')}>
-              Upgrade to Pro
+            <button 
+              className={`btn w-full ${currentPlan === 'pro' ? 'btn-outline active-plan' : 'btn-primary'}`}
+              onClick={() => handleSelectPlan('pro')}
+            >
+              {!isAuthenticated ? 'Upgrade to Pro' : currentPlan === 'pro' ? 'Current Plan' : 'Upgrade to Pro'}
             </button>
           </div>
-
+ 
           <div className="pricing-card">
             <div className="pricing-header">
               <h3>Organization</h3>
@@ -680,8 +710,11 @@ const notionLite = {
                 99.9% Uptime SLA
               </li>
             </ul>
-            <button className="btn btn-secondary w-full" onClick={() => navigate(isAuthenticated ? '/workspace' : '/register')}>
-              Contact Sales
+            <button 
+              className={`btn w-full ${currentPlan === 'org' ? 'btn-outline active-plan' : 'btn-secondary'}`}
+              onClick={() => handleSelectPlan('org')}
+            >
+              {!isAuthenticated ? 'Contact Sales' : currentPlan === 'org' ? 'Current Plan' : 'Contact Sales'}
             </button>
           </div>
         </div>
@@ -724,18 +757,25 @@ const notionLite = {
       </section>
 
       {/* Footer */}
+      {/* Footer */}
       <footer className="landing-footer">
-        <div className="footer-brand">
-          <div className="landing-logo-icon" style={{ width: '24px', height: '24px', fontSize: '0.85rem' }}>N</div>
-          <span>Notion Lite</span>
+
+        {/* Center Giant Wordmark */}
+        <div className="footer-wordmark-container">
+          <div className="footer-wordmark">Notion Lite</div>
         </div>
-        <div>
-          <span>&copy; {new Date().getFullYear()} Notion Lite. All rights reserved.</span>
-        </div>
-        <div className="footer-links">
-          <a href="#" className="footer-link">Documentation</a>
-          <a href="#" className="footer-link">Privacy</a>
-          <a href="#" className="footer-link">GitHub</a>
+
+        {/* Bottom Metadata Row */}
+        <div className="footer-bottom-row">
+          <div className="footer-bottom-left">
+            <span className="footer-bottom-logo">Notion Lite</span>
+          </div>
+          <div className="footer-bottom-right">
+            <a href="#" className="footer-bottom-link">Documentation</a>
+            <a href="#" className="footer-bottom-link">Privacy</a>
+            <a href="#" className="footer-bottom-link">GitHub</a>
+            <span className="footer-copyright">&copy; {new Date().getFullYear()}</span>
+          </div>
         </div>
       </footer>
     </div>
