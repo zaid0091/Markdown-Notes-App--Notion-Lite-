@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
-:root {
+.auth-container {
   --bg-dark: hsl(220, 25%, 8%);
   --card-bg: hsla(220, 25%, 12%, 0.7);
   --border-glass: hsla(220, 25%, 22%, 0.6);
