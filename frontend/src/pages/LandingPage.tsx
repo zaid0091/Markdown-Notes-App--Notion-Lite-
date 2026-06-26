@@ -352,12 +352,29 @@ const notionLite = {
 
       {/* Header Navigation */}
       <header className="landing-nav">
-        <a href="#" className="landing-logo">
+        <a href="#" className="landing-logo" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
           <div className="landing-logo-icon">N</div>
           <span>Notion Lite</span>
         </a>
         
         <div className="landing-nav-actions">
+          <a 
+            href="/docs" 
+            className="landing-nav-link" 
+            onClick={(e) => { e.preventDefault(); navigate('/docs'); }}
+            style={{ 
+              marginRight: '16px', 
+              color: 'var(--text-secondary)', 
+              textDecoration: 'none', 
+              fontWeight: 600, 
+              fontSize: '0.9rem',
+              transition: 'color 0.2s'
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+            onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+          >
+            Docs
+          </a>
           <ThemeToggle />
           {isAuthenticated ? (
             <button className="btn btn-primary" onClick={() => navigate('/workspace')}>
@@ -757,8 +774,12 @@ const notionLite = {
       </section>
 
       {/* Footer */}
-      {/* Footer */}
       <footer className="landing-footer">
+        {/* Top Centered Section (Small Links Stacked) */}
+        <div className="footer-top-links">
+          <a href="#" className="footer-sub-link">Press</a>
+          <a href="#" className="footer-sub-link">Releases</a>
+        </div>
 
         {/* Center Giant Wordmark */}
         <div className="footer-wordmark-container">
@@ -771,7 +792,13 @@ const notionLite = {
             <span className="footer-bottom-logo">Notion Lite</span>
           </div>
           <div className="footer-bottom-right">
-            <a href="#" className="footer-bottom-link">Documentation</a>
+            <a 
+              href="/docs" 
+              className="footer-bottom-link"
+              onClick={(e) => { e.preventDefault(); navigate('/docs'); }}
+            >
+              Documentation
+            </a>
             <a href="#" className="footer-bottom-link">Privacy</a>
             <a href="#" className="footer-bottom-link">GitHub</a>
             <span className="footer-copyright">&copy; {new Date().getFullYear()}</span>
