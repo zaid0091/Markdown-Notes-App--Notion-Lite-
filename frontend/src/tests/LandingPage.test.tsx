@@ -38,6 +38,7 @@ describe('LandingPage Component', () => {
       login: vi.fn(),
       register: vi.fn(),
       logout: vi.fn(),
+      updateUser: vi.fn(),
     });
 
     render(
@@ -64,6 +65,7 @@ describe('LandingPage Component', () => {
       login: vi.fn(),
       register: vi.fn(),
       logout: vi.fn(),
+      updateUser: vi.fn(),
     });
 
     render(
@@ -95,6 +97,7 @@ describe('LandingPage Component', () => {
       login: vi.fn(),
       register: vi.fn(),
       logout: vi.fn(),
+      updateUser: vi.fn(),
     });
 
     render(
@@ -120,6 +123,7 @@ describe('LandingPage Component', () => {
       login: vi.fn(),
       register: vi.fn(),
       logout: vi.fn(),
+      updateUser: vi.fn(),
     });
 
     render(

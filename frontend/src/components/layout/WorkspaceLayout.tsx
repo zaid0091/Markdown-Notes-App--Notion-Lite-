@@ -1,30 +1,19 @@
 import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { client, getAssetUrl } from '../../api/client';
+import { getAssetUrl } from '../../api/client';
 import { ThemeToggle } from '../common/ThemeToggle';
 import BrandLogo from '../common/BrandLogo';
 import { PageTree } from '../sidebar/PageTree';
 import { SearchPalette } from '../search/SearchPalette';
+import LoadingScreen from '../common/LoadingScreen';
 
 export const WorkspaceLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout, isRestoringSession } = useAuth();
   const navigate = useNavigate();
 
   if (isRestoringSession) {
-    return (
-      <div style={{
-        display: 'flex',
-        height: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'var(--bg-primary)',
-        color: 'var(--text-secondary)',
-        fontFamily: 'system-ui, sans-serif'
-      }}>
-        <div style={{ fontSize: '1.1rem', fontWeight: 500 }}>Loading session...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

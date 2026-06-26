@@ -19,8 +19,7 @@ export const Navbar: React.FC = () => {
         className="landing-logo"
         onClick={(e) => { e.preventDefault(); navigate('/'); }}
       >
-        <BrandLogo size={18} />
-        <span>Notion Lite</span>
+        <BrandLogo size={22} />
       </a>
 
       <div className="landing-nav-actions">

@@ -76,6 +76,7 @@ describe('NotePage Component', () => {
       login: vi.fn(),
       register: vi.fn(),
       logout: vi.fn(),
+      updateUser: vi.fn(),
     });
 
     vi.mocked(hooks.usePageDetails).mockReturnValue({

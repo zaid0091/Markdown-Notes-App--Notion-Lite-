@@ -8,7 +8,7 @@ import '../styles/landing.css';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   // Subscription plans state
   const [currentPlan, setCurrentPlan] = useState<string>('free');
@@ -31,7 +31,7 @@ export const LandingPage: React.FC = () => {
     // Set new plan in localStorage to simulate subscription
     localStorage.setItem('user_plan', planName);
     setCurrentPlan(planName);
-    navigate('/workspace');
+    navigate('/profile');
   };
 
   // Set landing page document title on mount
@@ -760,7 +760,7 @@ const notionLite = {
             >
               Privacy
             </a>
-            <a href="#" className="footer-bottom-link">GitHub</a>
+            <a href="https://github.com/zaid0091/Markdown-Notes-App--Notion-Lite-" className="footer-bottom-link">GitHub</a>
             <span className="footer-copyright">&copy; {new Date().getFullYear()}</span>
           </div>
         </div>

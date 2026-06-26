@@ -8,16 +8,13 @@ import LandingPage from '../pages/LandingPage';
 import DocsPage from '../pages/DocsPage';
 import ProfilePage from '../pages/ProfilePage';
 import PrivacyPage from '../pages/PrivacyPage';
+import LoadingScreen from '../components/common/LoadingScreen';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isRestoringSession } = useAuth();
 
   if (isRestoringSession) {
-    return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: 'sans-serif', color: '#666' }}>Loading session...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!isAuthenticated) {
@@ -31,11 +28,7 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isRestoringSession } = useAuth();
 
   if (isRestoringSession) {
-    return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: 'sans-serif', color: '#666' }}>Loading session...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (isAuthenticated) {
@@ -49,11 +42,7 @@ export const AppRoutes: React.FC = () => {
   const { isAuthenticated, isRestoringSession } = useAuth();
 
   if (isRestoringSession) {
-    return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: 'sans-serif', color: '#666' }}>Loading session...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
