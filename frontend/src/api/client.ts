@@ -1,7 +1,15 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { getToken, setToken } from './tokenStore';
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+export const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+export const getAssetUrl = (url: string | null | undefined) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const formattedBaseUrl = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+  const path = url.startsWith('/') ? url : `/${url}`;
+  return `${formattedBaseUrl}${path}`;
+};
 
 export const client = axios.create({
   baseURL,

@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import ThemeToggle from '../components/common/ThemeToggle';
 import PreviewPane from '../components/editor/PreviewPane';
+import BrandLogo from '../components/common/BrandLogo';
+import { getAssetUrl } from '../api/client';
 import '../styles/landing.css';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   
   // Subscription plans state
   const [currentPlan, setCurrentPlan] = useState<string>('free');
@@ -353,7 +355,9 @@ const notionLite = {
       {/* Header Navigation */}
       <header className="landing-nav">
         <a href="#" className="landing-logo" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
-          <div className="landing-logo-icon">N</div>
+          <div className="landing-logo-icon">
+            <BrandLogo size={18} />
+          </div>
           <span>Notion Lite</span>
         </a>
         
@@ -377,10 +381,52 @@ const notionLite = {
           </a>
           <ThemeToggle />
           {isAuthenticated ? (
-            <button className="btn btn-primary" onClick={() => navigate('/workspace')}>
-              Go to Workspace
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {user && (
+                <div
+                  onClick={() => navigate('/profile')}
+                  title="View Account Settings"
+                  style={{
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '50%',
+                    background: 'var(--accent-gradient)',
+                    color: 'white',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 10px rgba(123, 31, 162, 0.2)',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    overflow: 'hidden',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.06)';
+                    e.currentTarget.style.boxShadow = '0 6px 15px rgba(123, 31, 162, 0.3)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = '0 4px 10px rgba(123, 31, 162, 0.2)';
+                  }}
+                >
+                  {user.profile_picture ? (
+                    <img 
+                      src={getAssetUrl(user.profile_picture)} 
+                      alt="Avatar" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} 
+                    />
+                  ) : (
+                    user.username.slice(0, 2).toUpperCase()
+                  )}
+                </div>
+              )}
+              <button className="btn btn-primary" onClick={() => navigate('/workspace')}>
+                Go to Workspace
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
           ) : (
             <>
               <button className="btn btn-outline" onClick={() => navigate('/login')}>
@@ -782,7 +828,8 @@ const notionLite = {
 
         {/* Bottom Metadata Row */}
         <div className="footer-bottom-row">
-          <div className="footer-bottom-left">
+          <div className="footer-bottom-left" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <BrandLogo size={18} withBackground={true} />
             <span className="footer-bottom-logo">Notion Lite</span>
           </div>
           <div className="footer-bottom-right">

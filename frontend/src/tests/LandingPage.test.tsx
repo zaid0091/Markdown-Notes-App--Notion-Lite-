@@ -51,9 +51,9 @@ describe('LandingPage Component', () => {
     expect(screen.getByText(/A premium, glassmorphic markdown canvas/i)).toBeInTheDocument();
 
     // Feature card headers
-    expect(screen.getByText('Recursive Page Tree')).toBeInTheDocument();
-    expect(screen.getByText('LaTeX Math Rendering')).toBeInTheDocument();
-    expect(screen.getByText('Omnibar Search Palette')).toBeInTheDocument();
+    expect(screen.getByText('Nested Workspace')).toBeInTheDocument();
+    expect(screen.getByText('LaTeX Math')).toBeInTheDocument();
+    expect(screen.getByText('Omnibar Search')).toBeInTheDocument();
   });
 
   test('renders guest CTAs when unauthenticated', () => {
@@ -133,6 +133,6 @@ describe('LandingPage Component', () => {
 
     // Update text
     fireEvent.change(textarea, { target: { value: '# Hello Antigravity' } });
-    expect(screen.getByTestId('mock-preview-pane')).toHaveTextContent('# Hello Antigravity');
+    expect(screen.getAllByTestId('mock-preview-pane')[1]).toHaveTextContent('# Hello Antigravity');
   });
 });

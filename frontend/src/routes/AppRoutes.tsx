@@ -6,6 +6,7 @@ import RegisterPage from '../pages/RegisterPage';
 import NotePage from '../pages/NotePage';
 import LandingPage from '../pages/LandingPage';
 import DocsPage from '../pages/DocsPage';
+import ProfilePage from '../pages/ProfilePage';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isRestoringSession } = useAuth();
@@ -86,6 +87,14 @@ export const AppRoutes: React.FC = () => {
           element={
             <ProtectedRoute>
               <NotePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
             </ProtectedRoute>
           }
         />
