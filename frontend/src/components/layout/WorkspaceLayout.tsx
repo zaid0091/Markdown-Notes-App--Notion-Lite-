@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getAssetUrl } from '../../api/client';
 import { ThemeToggle } from '../common/ThemeToggle';
 import BrandLogo from '../common/BrandLogo';
@@ -44,8 +44,9 @@ export const WorkspaceLayout: React.FC<{ children: React.ReactNode }> = ({ child
             marginBottom: '24px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-primary)' }}>
-              <BrandLogo size={24} withBackground={true} />
-              <span>Notion Lite</span>
+              <Link to="/">
+                <BrandLogo size={38} withBackground={true} />
+              </Link>
             </div>
             <ThemeToggle />
           </div>

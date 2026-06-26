@@ -385,7 +385,9 @@ const notionLite = {
             {/* Sidebar Mockup */}
             <div className="mockup-sidebar">
               <div className="mockup-user-info">
-                <div className="mockup-avatar">NL</div>
+                <div className="mockup-avatar">
+                  <BrandLogo size={30} />
+                </div>
                 <span>Workspace Hub</span>
               </div>
               <div className="mockup-tree-section">
