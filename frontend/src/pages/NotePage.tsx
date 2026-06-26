@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { usePageDetails } from '../hooks/usePages';
@@ -17,6 +17,15 @@ export const NotePage: React.FC = () => {
   const [draftContent, setDraftContent] = useState('');
   const [prevPageId, setPrevPageId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'edit' | 'split' | 'preview'>('split');
+
+  // Update document title dynamically based on selected note
+  useEffect(() => {
+    if (id && page) {
+      document.title = `${page.title || 'Untitled'} | Notion Lite`;
+    } else {
+      document.title = "Workspace | Notion Lite";
+    }
+  }, [id, page]);
 
   // Sync draftContent state with prop page.content synchronously on load or page navigation
   if (page && page.id !== prevPageId) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import ThemeToggle from '../components/common/ThemeToggle';
@@ -11,6 +11,9 @@ interface LoginErrorResponse {
 }
 
 const LoginPage: React.FC = () => {
+  useEffect(() => {
+    document.title = "Notion Lite | Sign In";
+  }, []);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

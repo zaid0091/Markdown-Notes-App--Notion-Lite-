@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import ThemeToggle from '../components/common/ThemeToggle';
@@ -14,6 +14,9 @@ interface RegisterErrorResponse {
 }
 
 const RegisterPage: React.FC = () => {
+  useEffect(() => {
+    document.title = "Notion Lite | Sign Up";
+  }, []);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

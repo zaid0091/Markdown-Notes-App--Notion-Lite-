@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '../components/common/ThemeToggle';
+import BrandLogo from '../components/common/BrandLogo';
 import '../styles/docs.css';
 
 export const DocsPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = "Notion Lite | Documentation";
+  }, []);
 
   // Documentation sections structure
   const docSections = [
@@ -61,8 +66,8 @@ export const DocsPage: React.FC = () => {
 
       {/* Mobile Top Header */}
       <header className="docs-mobile-header">
-        <a href="#" className="docs-logo" onClick={() => navigate('/')}>
-          <div className="docs-logo-icon">N</div>
+        <a href="#" className="docs-logo" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
+          <BrandLogo size={24} />
           <span>Notion Lite Docs</span>
         </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -86,8 +91,8 @@ export const DocsPage: React.FC = () => {
       {/* Navigation Sidebar */}
       <aside className={`docs-sidebar ${isMobileSidebarOpen ? 'open' : ''}`}>
         <div className="docs-sidebar-header">
-          <a href="#" className="docs-logo" onClick={() => navigate('/')}>
-            <div className="docs-logo-icon">N</div>
+          <a href="#" className="docs-logo" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
+            <BrandLogo size={24} />
             <span>Notion Lite Docs</span>
           </a>
           

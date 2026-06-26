@@ -1,10 +1,7 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import BrandLogo from '../components/common/BrandLogo';
-import ThemeToggle from '../components/common/ThemeToggle';
+import Navbar from '../components/common/Navbar';
 
 export const PrivacyPage: React.FC = () => {
-  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = "Notion Lite | Privacy Policy";
@@ -20,45 +17,7 @@ export const PrivacyPage: React.FC = () => {
       paddingBottom: '80px'
     }}>
       {/* Top Navbar Header */}
-      <header style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        backdropFilter: 'blur(12px)',
-        backgroundColor: 'var(--bg-header)',
-        borderBottom: '1px solid var(--border-color)',
-        padding: '16px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <div 
-          onClick={() => navigate('/')}
-          style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontWeight: 700, fontSize: '1.2rem' }}
-        >
-          <BrandLogo size={28} withBackground={true} />
-          <span>Notion Lite</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button 
-            onClick={() => navigate('/')} 
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              transition: 'color 0.2s'
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-            onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-          >
-            Back to Home
-          </button>
-          <ThemeToggle />
-        </div>
-      </header>
+      <Navbar />
 
       {/* Main Content Container */}
       <main style={{

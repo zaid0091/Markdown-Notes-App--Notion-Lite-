@@ -23,10 +23,11 @@ export const ProfilePage: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [shouldRemovePicture, setShouldRemovePicture] = useState(false);
 
-  // Load plan from localStorage on mount
+  // Load plan from localStorage on mount and set title
   useEffect(() => {
     const savedPlan = localStorage.getItem('user_plan') || 'free';
     setPlan(savedPlan);
+    document.title = "Notion Lite | Account Settings";
   }, []);
 
   const getPlanDisplayName = (planValue: string) => {
