@@ -19,7 +19,7 @@ export const Navbar: React.FC = () => {
         className="landing-logo"
         onClick={(e) => { e.preventDefault(); navigate('/'); }}
       >
-        <BrandLogo size={22} />
+        <BrandLogo size={38} />
       </a>
 
       <div className="landing-nav-actions">

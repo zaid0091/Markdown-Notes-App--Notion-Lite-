@@ -742,8 +742,8 @@ const notionLite = {
         {/* Bottom Metadata Row */}
         <div className="footer-bottom-row">
           <div className="footer-bottom-left" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <BrandLogo size={18} withBackground={true} />
-            <span className="footer-bottom-logo">Notion Lite</span>
+            <BrandLogo size={30} withBackground={true} />
+            
           </div>
           <div className="footer-bottom-right">
             <a 
