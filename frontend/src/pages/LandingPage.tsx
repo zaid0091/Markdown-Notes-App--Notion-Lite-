@@ -418,7 +418,7 @@ const notionLite = {
       <section className="landing-hero">
         <div className="landing-badge animate-pop-in">
           <span className="landing-badge-pulse"></span>
-          <span>Introducing Notion Lite 1.0</span>
+          <span>Introducing Notion Lite</span>
         </div>
         
         <h1 className="landing-title animate-slide-up">
