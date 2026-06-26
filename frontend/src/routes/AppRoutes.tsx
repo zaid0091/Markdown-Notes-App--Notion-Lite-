@@ -7,6 +7,7 @@ import NotePage from '../pages/NotePage';
 import LandingPage from '../pages/LandingPage';
 import DocsPage from '../pages/DocsPage';
 import ProfilePage from '../pages/ProfilePage';
+import PrivacyPage from '../pages/PrivacyPage';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isRestoringSession } = useAuth();
@@ -81,6 +82,10 @@ export const AppRoutes: React.FC = () => {
         <Route
           path="/docs"
           element={<DocsPage />}
+        />
+        <Route
+          path="/privacy"
+          element={<PrivacyPage />}
         />
         <Route
           path="/workspace"

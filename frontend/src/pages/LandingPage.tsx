@@ -840,7 +840,13 @@ const notionLite = {
             >
               Documentation
             </a>
-            <a href="#" className="footer-bottom-link">Privacy</a>
+            <a 
+              href="/privacy" 
+              className="footer-bottom-link"
+              onClick={(e) => { e.preventDefault(); navigate('/privacy'); }}
+            >
+              Privacy
+            </a>
             <a href="#" className="footer-bottom-link">GitHub</a>
             <span className="footer-copyright">&copy; {new Date().getFullYear()}</span>
           </div>
