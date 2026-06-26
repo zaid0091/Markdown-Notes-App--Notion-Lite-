@@ -39,6 +39,66 @@ export const LandingPage: React.FC = () => {
     document.title = "Notion Lite | Next-Gen Markdown Workspace";
   }, []);
 
+  // Scroll reveal and 3D transform mockup animation
+  useEffect(() => {
+    // 1. 3D Tilt Mockup Scroll Animation
+    const mockup = document.querySelector('.landing-mockup-wrapper') as HTMLElement;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          const threshold = 600;
+          const ratio = Math.min(scrollY / threshold, 1);
+          
+          if (mockup) {
+            const rotateX = 12 * (1 - ratio);
+            const scale = 0.94 + 0.06 * ratio;
+            const translateY = 25 * (1 - ratio);
+            const opacity = 0.85 + 0.15 * ratio;
+            
+            mockup.style.transform = `perspective(1000px) rotateX(${rotateX}deg) scale(${scale}) translateY(${translateY}px)`;
+            mockup.style.opacity = `${opacity}`;
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    // 2. IntersectionObserver Scroll Reveal
+    const revealElements = document.querySelectorAll('.reveal');
+    if (typeof IntersectionObserver === 'undefined') {
+      revealElements.forEach((el) => el.classList.add('revealed'));
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -60px 0px'
+    });
+
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      revealElements.forEach((el) => observer.unobserve(el));
+    };
+  }, []);
+
   // Mockup pages content
   const mockupPages = [
     {
@@ -433,7 +493,7 @@ const notionLite = {
       </section>
 
       {/* Feature Exploration Tabs Section */}
-      <section className="landing-tabs-section">
+      <section className="landing-tabs-section reveal">
         <div className="section-header">
           <h2 className="section-title">Everything you need, built in.</h2>
           <p className="section-subtitle">We parsed the complexity of modern document editors into a fast, single-file compiler workspace.</p>
@@ -444,7 +504,7 @@ const notionLite = {
             {featureTabs.map((tab) => (
               <button
                 key={tab.id}
-                className={`tab-toggle-btn ${activeFeatureTab === tab.id ? 'active' : ''}`}
+                className={`tab-toggle-btn reveal-child ${activeFeatureTab === tab.id ? 'active' : ''}`}
                 onClick={() => setActiveFeatureTab(tab.id)}
               >
                 <div className="tab-toggle-header">
@@ -456,7 +516,7 @@ const notionLite = {
             ))}
           </div>
 
-          <div className="tab-preview-display">
+          <div className="tab-preview-display reveal-child">
             <div className="preview-display-window">
               <div className="window-header">
                 <div className="window-dots">
@@ -475,7 +535,7 @@ const notionLite = {
       </section>
 
       {/* Interactive Sandbox Playground */}
-      <section id="demo" className="landing-playground-section">
+      <section id="demo" className="landing-playground-section reveal">
         <div className="playground-glow"></div>
         <h2 className="section-title">Try it in the sandbox</h2>
         <p className="section-subtitle">Write standard markdown or KaTeX formulas below to test our compiler in real time.</p>
@@ -528,12 +588,12 @@ const notionLite = {
       </section>
 
       {/* Client Testimonials Section */}
-      <section className="landing-testimonials-section">
+      <section className="landing-testimonials-section reveal">
         <h2 className="section-title">Loved by developers and writers.</h2>
         <p className="section-subtitle">Here is what developers, scientists, and content creators say about Notion Lite.</p>
         
         <div className="testimonials-grid">
-          <div className="testimonial-card">
+          <div className="testimonial-card reveal-child">
             <div className="testimonial-stars">★★★★★</div>
             <p className="testimonial-quote">
               "Notion Lite has replaced my bloated note-taking apps. The markdown compiler runs at 0ms latency, and the KaTeX integration is perfect for formulating my algorithms."
@@ -547,7 +607,7 @@ const notionLite = {
             </div>
           </div>
 
-          <div className="testimonial-card">
+          <div className="testimonial-card reveal-child">
             <div className="testimonial-stars">★★★★★</div>
             <p className="testimonial-quote">
               "The slash commands make writing documentation twice as fast. The UI is clean, glassmorphic, and lets me focus completely on the prose."
@@ -561,7 +621,7 @@ const notionLite = {
             </div>
           </div>
 
-          <div className="testimonial-card">
+          <div className="testimonial-card reveal-child">
             <div className="testimonial-stars">★★★★★</div>
             <p className="testimonial-quote">
               "I use it to draft my physics lecture notes. The LaTeX support is seamless, and exporting to printing-ready PDF takes just one click."
@@ -578,12 +638,12 @@ const notionLite = {
       </section>
 
       {/* Pricing Section */}
-      <section className="landing-pricing-section">
+      <section className="landing-pricing-section reveal">
         <h2 className="section-title">Simple, transparent plans.</h2>
         <p className="section-subtitle">Start organizing for free, upgrade as your team grow.</p>
         
         <div className="pricing-grid">
-          <div className="pricing-card">
+          <div className="pricing-card reveal-child">
             <div className="pricing-header">
               <h3>Free Sandbox</h3>
               <div className="price">$0<span>/ month</span></div>
@@ -615,7 +675,7 @@ const notionLite = {
             </button>
           </div>
  
-          <div className="pricing-card featured">
+          <div className="pricing-card featured reveal-child">
             <div className="featured-badge">RECOMMENDED</div>
             <div className="pricing-header">
               <h3>Pro Developer</h3>
@@ -656,7 +716,7 @@ const notionLite = {
             </button>
           </div>
  
-          <div className="pricing-card">
+          <div className="pricing-card reveal-child">
             <div className="pricing-header">
               <h3>Organization</h3>
               <div className="price">$19<span>/ user / mo</span></div>
@@ -699,7 +759,7 @@ const notionLite = {
       </section>
 
       {/* FAQ Accordion Section */}
-      <section className="landing-faq-section">
+      <section className="landing-faq-section reveal">
         <h2 className="section-title">Frequently Asked Questions</h2>
         <p className="section-subtitle">Quick answers to common inquiries about Notion Lite's setup and features.</p>
         
@@ -707,7 +767,7 @@ const notionLite = {
           {faqData.map((faq, index) => (
             <div 
               key={index} 
-              className={`faq-item ${openFAQIndex === index ? 'open' : ''}`}
+              className={`faq-item reveal-child ${openFAQIndex === index ? 'open' : ''}`}
               onClick={() => toggleFAQ(index)}
             >
               <button className="faq-question">
@@ -725,7 +785,7 @@ const notionLite = {
       </section>
 
       {/* CTA Conversion Banner */}
-      <section className="landing-cta-banner">
+      <section className="landing-cta-banner reveal">
         <h2>Start structuring your thoughts today.</h2>
         <p>Sign up now to save nested folders, covers, tags, and run queries instantly across your entire workspace.</p>
         <button className="btn btn-primary" onClick={() => navigate(isAuthenticated ? '/workspace' : '/register')}>
