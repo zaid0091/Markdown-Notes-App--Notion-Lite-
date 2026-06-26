@@ -775,12 +775,6 @@ const notionLite = {
 
       {/* Footer */}
       <footer className="landing-footer">
-        {/* Top Centered Section (Small Links Stacked) */}
-        <div className="footer-top-links">
-          <a href="#" className="footer-sub-link">Press</a>
-          <a href="#" className="footer-sub-link">Releases</a>
-        </div>
-
         {/* Center Giant Wordmark */}
         <div className="footer-wordmark-container">
           <div className="footer-wordmark">Notion Lite</div>
