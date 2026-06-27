@@ -220,7 +220,7 @@ export const EditorPane: React.FC<EditorPaneProps> = ({ page, onChange }) => {
             outline: 'none',
             background: 'transparent',
             color: 'var(--text-primary)',
-            fontFamily: 'Consolas, Monaco, "Courier New", Courier, monospace',
+            fontFamily: "'Fira Code', Consolas, Monaco, 'Courier New', Courier, monospace",
             fontSize: '15px',
             lineHeight: '24px',
             padding: '24px 54px',
