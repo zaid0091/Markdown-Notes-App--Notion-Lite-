@@ -21,7 +21,7 @@ Notion Lite is a high-fidelity, responsive single-file compiler workspace design
 
 ```mermaid
 graph TD
-  subgraph Frontend (React + TypeScript)
+  subgraph Frontend ["Frontend (React + TypeScript)"]
     UI[Glassmorphic UI Pages] --> Router[React Router Dom AppRoutes]
     Router --> AuthGuard[useAuth Guard Hook]
     AuthGuard --> Workspace[Workspace WorkspaceLayout]
@@ -30,7 +30,7 @@ graph TD
     Workspace --> Tree[Page Tree Navigation]
   end
 
-  subgraph Backend (Django REST Framework)
+  subgraph Backend ["Backend (Django REST Framework)"]
     API[Django API Engine] --> Auth[users JWT Auth Guard]
     API --> NotesApp[notes CRUD Controllers]
     NotesApp --> Database[(SQLite / PostgreSQL Database)]
